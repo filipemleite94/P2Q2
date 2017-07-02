@@ -37,9 +37,6 @@ public class SecureClass {
 		    	return;
 		    }
 		    if (opr.equals("R")){
-		    	if(!file.canRead()){
-		    		System.out.println("Arquivo não é legível");
-		    	}
 				FileReader fr = null;
 				StringBuilder sb = null;
 				char carac = 0;
@@ -59,9 +56,6 @@ public class SecureClass {
 			}
 			
 			else {
-				  if(!file.canWrite()){
-					  System.out.println("Arquivo não pode ser escrito");
-				  }
 				  FileWriter fw;
 				  BufferedWriter buffWrite;
 				  try {
