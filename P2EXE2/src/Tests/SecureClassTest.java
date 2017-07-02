@@ -3,7 +3,6 @@ package Tests;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -90,7 +89,7 @@ public class SecureClassTest {
 	@Test
 	public void testSetUp() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream(" R ".getBytes());
+		ba = new ByteArrayInputStream(" R\n ".getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod(filename);
 		assertEquals(msgPedirComando, myPS.getText());
@@ -99,7 +98,7 @@ public class SecureClassTest {
 	@Test
 	public void testIncorrectFileName() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream(" R ".getBytes());
+		ba = new ByteArrayInputStream(" R\n ".getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod("Nome incorreto");
 		assertEquals(msgArquivoInexiste, myPS.getText());
@@ -108,7 +107,7 @@ public class SecureClassTest {
 	@Test
 	public void testHackFileName() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream(" R ".getBytes());
+		ba = new ByteArrayInputStream(" R\n ".getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod("../../dadosconfidenciais.txt");
 		assertEquals(msgArquivoIlegal, myPS.getText());
@@ -117,7 +116,7 @@ public class SecureClassTest {
 	@Test
 	public void testIllegalInput() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream(" A ".getBytes());
+		ba = new ByteArrayInputStream(" A\n ".getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod(filename);
 		assertEquals(msgPedirComando+msgEntradaInvalida, myPS.getText());
@@ -126,7 +125,7 @@ public class SecureClassTest {
 	@Test
 	public void testIllegalFileRead() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream(" R ".getBytes());
+		ba = new ByteArrayInputStream(" R\n ".getBytes());
 		System.setIn(ba);
 		File f = new File("NovoDirTeste");
 		if(!f.exists()){
@@ -139,7 +138,7 @@ public class SecureClassTest {
 	@Test
 	public void testIllegalFileWrite() throws IOException {
 		ByteArrayInputStream ba;
-		ba = new ByteArrayInputStream("W".getBytes());
+		ba = new ByteArrayInputStream("W\n".getBytes());
 		System.setIn(ba);
 		File f = new File("NovoDirTeste");
 		if(!f.exists()){
@@ -157,7 +156,7 @@ public class SecureClassTest {
 		for(i = 0; i <200; i++){
 			sb.append("c");
 		}
-		ba = new ByteArrayInputStream((" W " + sb.toString()+"\n").getBytes());
+		ba = new ByteArrayInputStream((" W\n " + sb.toString()+"\n").getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod(filename);
 		assertEquals(msgPedirComando + msgPedirTexto, myPS.getText());
@@ -183,9 +182,49 @@ public class SecureClassTest {
 		fw.write(str);
 		fw.flush();
 		fw.close();
-		ba = new ByteArrayInputStream((" R ").getBytes());
+		ba = new ByteArrayInputStream((" R\n ").getBytes());
 		System.setIn(ba);
 		sc.vulnerableMethod(filename);
 		assertEquals(msgPedirComando + str.substring(0, 100), myPS.getText());
+	}
+	
+	@Test
+	public void testReadNormal() throws IOException {
+		ByteArrayInputStream ba;
+		StringBuilder sb = new StringBuilder();
+		String str;
+		int i;
+		for(i = 0; i <50; i++){
+			sb.append("c");
+		}
+		str = sb.toString();
+		File f = new File(filename);
+		FileWriter fw = new FileWriter(f);
+		fw.write(str);
+		fw.flush();
+		fw.close();
+		ba = new ByteArrayInputStream((" R\n ").getBytes());
+		System.setIn(ba);
+		sc.vulnerableMethod(filename);
+		assertEquals(msgPedirComando + str.substring(0, 50), myPS.getText());
+	}
+	
+	@Test
+	public void testWriteNormal() throws IOException {
+		ByteArrayInputStream ba;
+		StringBuilder sb = new StringBuilder();
+		int i;
+		for(i = 0; i <10; i++){
+			sb.append("c");
+		}
+		ba = new ByteArrayInputStream(("W\n" + sb.toString()+"\n").getBytes());
+		System.setIn(ba);
+		sc.vulnerableMethod(filename);
+		assertEquals(msgPedirComando + msgPedirTexto, myPS.getText());
+		File f = new File(filename);
+		FileReader fr = new FileReader(f);
+		for(i = 0; fr.read()!=-1;i++);
+		i--;
+		assertEquals(10, i);
 	}
 }

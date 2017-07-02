@@ -68,6 +68,7 @@ public class SecureClass {
 					fw = new FileWriter(file);
 					buffWrite = new BufferedWriter(fw);
 					String linha = "";
+					console.nextLine();
 					System.out.println("Escreva algo: ");
 					if(console.hasNextLine()){
 						linha = console.nextLine();
